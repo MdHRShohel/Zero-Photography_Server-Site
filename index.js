@@ -40,19 +40,31 @@ async function run() {
     });
     //single service details
     app.get("/services/:id", async (req, res) => {
-        const id = req.params.id;
-        const query = {_id: ObjectId(id)};
-        const service = await serviceCollection.findOne(query);
-        res.send(service);
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const service = await serviceCollection.findOne(query);
+      res.send(service);
+    });
+
+    // reviews
+    app.get("/reviews", async (req, res) => {
+      let query = {};
+      if (req.query.email) {
+        query = {
+          email: req.query.email,
+        };
+      }
+      const cursor = reviewCollection.filter(query);
+      const reviews = await cursor.toArray();
+      res.send(reviews);
     });
 
     // add review
-    app.post("/reviews", async (req, res) => {
+    app.post("/add-review", async (req, res) => {
       const review = req.body;
       const result = await reviewCollection.insertOne(review);
       res.send(result);
     });
-
   } finally {
     // Ensures that the client will close when you finish/error
     //await client.close();
