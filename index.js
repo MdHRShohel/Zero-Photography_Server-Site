@@ -31,7 +31,14 @@ async function run() {
       const services = await cursor.toArray();
       res.send(services);
     });
-  
+    // all services
+    app.get("/services", async (req, res) => {
+      const query = {};
+      const cursor = serviceCollection.find(query);
+      const services = await cursor.toArray();
+      res.send(services);
+    });
+
   } finally {
     // Ensures that the client will close when you finish/error
     //await client.close();
