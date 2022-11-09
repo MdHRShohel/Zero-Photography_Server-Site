@@ -46,6 +46,12 @@ async function run() {
         res.send(service);
     });
 
+    // add review
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
+      res.send(result);
+    });
 
   } finally {
     // Ensures that the client will close when you finish/error
