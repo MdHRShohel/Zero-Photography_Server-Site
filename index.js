@@ -54,7 +54,7 @@ async function run() {
           email: req.query.email,
         };
       }
-      const cursor = reviewCollection.filter(query);
+      const cursor = reviewCollection.find(query);
       const reviews = await cursor.toArray();
       res.send(reviews);
     });
@@ -65,6 +65,14 @@ async function run() {
       const result = await reviewCollection.insertOne(review);
       res.send(result);
     });
+
+    //add service
+    app.post("/add-service", async (req, res) => {
+      const review = req.body;
+      const result = await serviceCollection.insertOne(review);
+      res.send(result);
+    });
+
   } finally {
     // Ensures that the client will close when you finish/error
     //await client.close();
