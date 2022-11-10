@@ -27,14 +27,14 @@ async function run() {
     // services at home page
     app.get("/services-home", async (req, res) => {
       const query = {};
-      const cursor = serviceCollection.find(query).limit(3);
+      const cursor = serviceCollection.find(query).limit(3).sort({ _id: -01 });
       const services = await cursor.toArray();
       res.send(services);
     });
     // all services
     app.get("/services", async (req, res) => {
       const query = {};
-      const cursor = serviceCollection.find(query);
+      const cursor = serviceCollection.find(query).sort({ _id: -01 });
       const services = await cursor.toArray();
       res.send(services);
     });
@@ -58,12 +58,40 @@ async function run() {
       const reviews = await cursor.toArray();
       res.send(reviews);
     });
-
     // add review
     app.post("/add-review", async (req, res) => {
       const review = req.body;
       const result = await reviewCollection.insertOne(review);
       res.send(result);
+    });
+
+    //delete review
+    app.delete("/reviews/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await reviewCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // get review by email
+    app.get("/reviews", async (req, res) => {
+      let query = {};
+      if (req.query.email) {
+        query = {
+          email: req.query.email,
+        };
+      }
+      const cursor = reviewCollection.find(query);
+      const review = await cursor.toArray();
+      res.send(review);
+    });
+
+    //get review by id
+    app.get("/reviews/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const service = await reviewCollection.findOne(query);
+      res.send(service);
     });
 
     //add service
@@ -73,6 +101,21 @@ async function run() {
       res.send(result);
     });
 
+    //update reviews
+    app.put("/reviews/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const UpdatedReview = req.body;
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          name: UpdatedReview.name,
+          review: UpdatedReview.review,
+        }
+      }
+      const result = await reviewCollection.updateOne(filter, updateDoc, options);
+      res.send(result);      
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     //await client.close();
